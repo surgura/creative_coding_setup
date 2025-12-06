@@ -218,7 +218,7 @@ paths:
 
 ```
 * Other pc uses OBS to stream to mediamtx. stream -> custom -> url is srt://127.0.0.1:8890?streamid=publish:friend, stream code is empty.
-* They need to also output->advanced->video encoder x264 -> options `bframes=0`
+* They need to also output->advanced->video encoder x264 -> Profile baseline and tune zerolatency
 * Install v4l2loopback-kmp-default and reboot
 * Run `ffmpeg \
   -fflags nobuffer \
