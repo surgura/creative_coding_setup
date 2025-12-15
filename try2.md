@@ -4,6 +4,23 @@
 
 `gst-launch-1.0 udpsrc port=5000 caps="application/x-rtp,media=video,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false`
 
+looping directly to virtual camera:
+
+`gst-launch-1.0 udpsrc port=5000 \
+caps="application/x-rtp,media=video,encoding-name=H264,payload=96" \
+! rtpjitterbuffer latency=0 \
+! rtph264depay \
+! h264parse \
+! decodebin \
+! videoconvert \
+! video/x-raw,format=YUY2 \
+! v4l2sink device=/dev/video0 sync=false
+`
+
+have to create camera first with 
+
+`sudo modprobe v4l2loopback video_nr=10 card_label=GSTCam exclusive_caps=1`
+
 # On sender windows
 
 https://gstreamer.freedesktop.org/download/?__goaway_challenge=meta-refresh&__goaway_id=fd064a6910b8f1c0ccaba2d6c996c25e&__goaway_referer=https%3A%2F%2Fwww.google.com%2F#windows
