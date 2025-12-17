@@ -8,16 +8,7 @@
 
 looping directly to virtual camera:
 
-`gst-launch-1.0 udpsrc port=5000 \
-caps="application/x-rtp,media=video,encoding-name=H264,payload=96" \
-! rtpjitterbuffer latency=0 \
-! rtph264depay \
-! h264parse \
-! decodebin \
-! videoconvert \
-! video/x-raw,format=YUY2 \
-! v4l2sink device=/dev/video0 sync=false
-`
+`gst-launch-1.0 udpsrc port=5000 caps="application/x-rtp,media=video,encoding-name=H264,payload=96" ! rtpjitterbuffer latency=0 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink device=/dev/video0 sync=false`
 
 have to create camera first with 
 
