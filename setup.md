@@ -14,3 +14,22 @@
 ## Make borderless browsers apps
 * Install Nativefier
 * nativefier <url>  --name "<name>" --hide-window-frame
+
+###
+```
+let hidden = false;
+
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key.toLowerCase() === "j") {
+    hidden = !hidden;
+    document.querySelectorAll(".myclass").forEach(el => {
+      el.style.display = hidden ? "none" : "";
+    });
+  }
+});
+```
+```
+nativefier \
+  --inject toggle.js \
+  <ip>
+```
