@@ -15,7 +15,7 @@
 * Install Nativefier
 * nativefier <url>  --name "<name>" --hide-window-frame
 
-###
+### hydra (untested)
 ```
 let hidden = false;
 
@@ -28,8 +28,16 @@ document.addEventListener("keydown", e => {
   }
 });
 ```
+
 ```
 nativefier \
   --inject toggle.js \
   <ip>
+```
+
+```
+.myclass {
+  opacity: 0;
+  pointer-events: none;
+}
 ```
