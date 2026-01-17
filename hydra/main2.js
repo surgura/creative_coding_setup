@@ -1,0 +1,10 @@
+solid(1, 1, 1)
+    .diff(shape([4, 4, 4, 24].smooth().fast(.5), 0.95, .09).repeat(20, 10)).color(0, 0.2, 0)
+    .modulateScale(osc(2).rotate(-0.5), .22)
+    .add(
+        src(o0).scale(0.965).rotate(.012 * (Math.round(-2)))
+            .color(0.1, 0.5, 0.1)
+            .modulateRotate(o0, 0.5)
+            .brightness(.05)
+        , .7)
+    .out()
