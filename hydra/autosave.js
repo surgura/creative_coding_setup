@@ -47,14 +47,13 @@ async function startHydraDirAutosave() {
     await pickDirectory()
 
     const loaded = await loadLatestFromDir()
+
     if (!loaded) {
-        // keep whatever is currently in the editor
+        await saveNewSnapshot()
     }
 
     if (autosaveTimer) clearInterval(autosaveTimer)
     autosaveTimer = setInterval(saveNewSnapshot, 30000)
-
-    await saveNewSnapshot()
 }
 
 startHydraDirAutosave()
