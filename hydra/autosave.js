@@ -1,8 +1,17 @@
 let dirHandle = null
 let autosaveTimer = null
 
+function logError(err) {
+    console.error(err)
+    alert(String(err))
+}
+
 async function pickDirectory() {
-    dirHandle = await window.showDirectoryPicker()
+    try {
+        dirHandle = await window.showDirectoryPicker()
+    } catch (e) {
+        logError(e)
+    }
 }
 
 function isHydraFile(name) {
@@ -15,45 +24,63 @@ function extractTs(name) {
 }
 
 async function loadLatestFromDir() {
-    let latest = null
+    try {
+        let latest = null
 
-    for await (const [name, handle] of dirHandle.entries()) {
-        if (handle.kind !== "file") continue
-        if (!isHydraFile(name)) continue
+        for await (const [name, handle] of dirHandle.entries()) {
+            if (handle.kind !== "file") continue
+            if (!isHydraFile(name)) continue
 
-        const ts = extractTs(name)
-        if (ts < 0) continue
+            const ts = extractTs(name)
+            if (ts < 0) continue
 
-        if (!latest || ts > latest.ts) latest = { ts, handle }
+            if (!latest || ts > latest.ts) latest = { ts, handle }
+        }
+
+        if (!latest) return false
+
+        const file = await latest.handle.getFile()
+        editor.setValue(await file.text())
+        return true
+    } catch (e) {
+        logError(e)
+        return false
     }
-
-    if (!latest) return false
-
-    const file = await latest.handle.getFile()
-    editor.setValue(await file.text())
-    return true
 }
 
 async function saveNewSnapshot() {
-    const ts = Date.now()
-    const name = `hydra_${ts}.js`
-    const fileHandle = await dirHandle.getFileHandle(name, { create: true })
-    const writable = await fileHandle.createWritable()
-    await writable.write(editor.getValue())
-    await writable.close()
+    try {
+        const ts = Date.now()
+        const name = `hydra_${ts}.js`
+        const fileHandle = await dirHandle.getFileHandle(name, { create: true })
+        const writable = await fileHandle.createWritable()
+        await writable.write(editor.getValue())
+        await writable.close()
+    } catch (e) {
+        logError(e)
+    }
 }
 
 async function startHydraDirAutosave() {
-    await pickDirectory()
+    try {
+        await pickDirectory()
 
-    const loaded = await loadLatestFromDir()
+        if (!dirHandle) {
+            alert("No directory selected")
+            return
+        }
 
-    if (!loaded) {
-        await saveNewSnapshot()
+        const loaded = await loadLatestFromDir()
+
+        if (!loaded) {
+            await saveNewSnapshot()
+        }
+
+        if (autosaveTimer) clearInterval(autosaveTimer)
+        autosaveTimer = setInterval(saveNewSnapshot, 30000)
+    } catch (e) {
+        logError(e)
     }
-
-    if (autosaveTimer) clearInterval(autosaveTimer)
-    autosaveTimer = setInterval(saveNewSnapshot, 30000)
 }
 
 startHydraDirAutosave()
