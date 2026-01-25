@@ -61,15 +61,9 @@ async function saveNewSnapshot() {
     }
 }
 
-async function startHydraDirAutosave() {
+async function initHydraAutosave() {
     try {
-        await pickDirectory()
-
-        if (!dirHandle) {
-            alert("No directory selected")
-            return
-        }
-
+        dirHandle = await window.showDirectoryPicker()
         const loaded = await loadLatestFromDir()
 
         if (!loaded) {
@@ -78,9 +72,13 @@ async function startHydraDirAutosave() {
 
         if (autosaveTimer) clearInterval(autosaveTimer)
         autosaveTimer = setInterval(saveNewSnapshot, 30000)
+
+        console.log("Hydra autosave running")
+        alert("Hydra autosave running")
     } catch (e) {
         logError(e)
     }
 }
+
 
 startHydraDirAutosave()
