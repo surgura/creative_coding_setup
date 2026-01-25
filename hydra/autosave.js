@@ -24,14 +24,13 @@ async function loadLatestFromDir() {
         const ts = extractTs(name)
         if (ts < 0) continue
 
-        if (!latest || ts > latest.ts) latest = { ts, handle, name }
+        if (!latest || ts > latest.ts) latest = { ts, handle }
     }
 
     if (!latest) return false
 
     const file = await latest.handle.getFile()
-    const text = await file.text()
-    editor.setValue(text)
+    editor.setValue(await file.text())
     return true
 }
 
@@ -46,7 +45,11 @@ async function saveNewSnapshot() {
 
 async function startHydraDirAutosave() {
     await pickDirectory()
-    await loadLatestFromDir()
+
+    const loaded = await loadLatestFromDir()
+    if (!loaded) {
+        // keep whatever is currently in the editor
+    }
 
     if (autosaveTimer) clearInterval(autosaveTimer)
     autosaveTimer = setInterval(saveNewSnapshot, 30000)
