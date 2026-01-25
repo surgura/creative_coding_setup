@@ -9,6 +9,7 @@
     scale: Array(9).fill(0.5),
  x: Array(9).fill(0.0),
  y: Array(9).fill(0.0),
+ r: Array(9).fill(0.0),
  step: 0.05,
  min: 0,
  max: 1,
@@ -46,46 +47,53 @@
 
     window.win = win;
 
-    // hydra extension
-    if (!window.__win_hydra_ext) {
-      window.__win_hydra_ext = true;
+    if (window.__win_hydra_ext) return;
+    window.__win_hydra_ext = true;
 
-      const getHydra = () => {
-        const whereami = window.location?.href?.includes("hydra.ojack.xyz")
-        ? "editor"
-        : window.atom?.packages
-        ? "atom"
-        : "idk";
+  const getHydra = () => {
+    const whereami = window.location?.href?.includes("hydra.ojack.xyz")
+    ? "editor"
+    : window.atom?.packages
+    ? "atom"
+    : "idk";
 
-        if (whereami === "editor") return window.hydraSynth;
-        if (whereami === "atom")
-          return global.atom.packages.loadedPackages["atom-hydra"].mainModule.main.hydra;
-
-        return [
-          window.hydraSynth,
-          window._hydra,
-          window.hydra,
-          window.h,
-          window.H,
-          window.hy,
-        ].find((h) => h?.regl);
-      };
-
-      const _hydra = getHydra();
-      const _scope = _hydra.sandbox.makeGlobal ? window : _hydra.synth;
-
-      const gS = _scope.osc().constructor.prototype;
-
-      gS.towindow = function (num) {
-        if (!Number.isInteger(num) || num < 1 || num > win.count) {
-          return this; // no-op, keep chain intact
-        }
-
-        const i = num - 1;
-
-        return this
-        .scale(() => win.scale[i])
-        .scroll(() => win.x[i], () => win.y[i]);
-      };
+    if (whereami === "editor") return window.hydraSynth;
+    if (whereami === "atom") {
+      return global.atom.packages.loadedPackages["atom-hydra"].mainModule.main.hydra;
     }
+
+    return [
+      window.hydraSynth,
+      window._hydra,
+      window.hydra,
+      window.h,
+      window.H,
+      window.hy,
+    ].find((h) => h?.regl);
+  };
+
+  const _hydra = getHydra();
+  const _scope = _hydra.sandbox.makeGlobal ? window : _hydra.synth;
+
+  const gS = _scope.osc().constructor.prototype;
+
+  gS.toWindow = function (num, rot) {
+    if (!Number.isInteger(num) || num < 1 || num > win.count) {
+      return this;
+    }
+
+    const i = num - 1;
+
+    const rotFn =
+    typeof rot === "function"
+    ? rot
+    : typeof rot === "number"
+    ? () => rot
+    : () => win.r[i];
+
+    return this
+    .scale(() => win.scale[i])
+    .rotate(rotFn)
+    .scroll(() => win.x[i], () => win.y[i]);
+  };
 })();

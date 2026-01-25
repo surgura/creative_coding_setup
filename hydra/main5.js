@@ -10,12 +10,21 @@ s0.initCam(0)
 s1.initCam(1)
 s2.initCam(2)
 
-voronoi()
-.kaleid(4)
+// voronoi()
+// 	.kaleid(4)
+
+function winRotate(n) {
+    return Math.sin(time*(1+n/10)+n)/30;
+}
+
+solid(0.1,0.1,0.1)
 .layer(srcRelMask(s0)
-.towindow(1))
+.toWindow(1, () => winRotate(1)))
 .layer(srcRelMask(s0)
-.towindow(2))
+.toWindow(2, () => winRotate(2)))
+.layer(voronoi()
+.noWrap()
+.toWindow(3, () => winRotate(3)))
 
 .layer(text("Neon Move")
 .color(0.1, 0.5, 0.1)
