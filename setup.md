@@ -1,3 +1,6 @@
+## Matching steamdeck screen to projector
+xrandr --output eDP   --mode 800x1280   --rotate right   --transform 1.50,0,0,0,1.50,0,0,0,1   --same-as DisplayPort-0
+
 ## Install Hydra locally
 * git clone git@github.com:hydra-synth/hydra.git
 * cd hydra
